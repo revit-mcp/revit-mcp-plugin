@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\ICommandRegistry.cs" />
     <Compile Include="Commands\IRevitCommand.cs" />
     <Compile Include="Commands\IWaitableHandler.cs" />
     <Compile Include="Models\JsonRpc\IJsonRpcRequest.cs" />
