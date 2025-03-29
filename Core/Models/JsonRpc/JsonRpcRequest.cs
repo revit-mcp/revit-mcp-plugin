@@ -1,13 +1,14 @@
 ﻿using System;
+using Abstractions.Models.JsonRpc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace revit_mcp_plugin.Core.JsonRPC
+namespace Core.Models.JsonRpc
 {
     /// <summary>
     /// 表示JSON-RPC 2.0请求对象
     /// </summary>
-    public class JsonRPCRequest
+    public class JsonRpcRequest: IJsonRpcRequest
     {
         /// <summary>
         /// JSON-RPC版本，必须为"2.0"
@@ -92,21 +93,21 @@ namespace revit_mcp_plugin.Core.JsonRPC
         /// </summary>
         /// <typeparam name="T">目标类型</typeparam>
         /// <returns>转换后的对象</returns>
-        /// <exception cref="JsonRPCSerializationException">参数转换失败时抛出</exception>
+        /// <exception cref="JsonRpcSerializationException">参数转换失败时抛出</exception>
         public T GetParamsAs<T>()
         {
             try
             {
                 if (Params == null)
                 {
-                    throw new JsonRPCSerializationException("Request params is null");
+                    throw new JsonRpcSerializationException("Request params is null");
                 }
 
                 return Params.ToObject<T>();
             }
-            catch (Exception ex) when (!(ex is JsonRPCSerializationException))
+            catch (Exception ex) when (!(ex is JsonRpcSerializationException))
             {
-                throw new JsonRPCSerializationException(
+                throw new JsonRpcSerializationException(
                     $"Failed to convert params to type {typeof(T).Name}: {ex.Message}", ex);
             }
         }
@@ -188,13 +189,13 @@ namespace revit_mcp_plugin.Core.JsonRPC
         /// <param name="parameters">方法参数</param>
         /// <param name="id">请求ID，如果为null则创建通知请求</param>
         /// <returns>创建的请求对象</returns>
-        public static JsonRPCRequest Create(string method, object parameters = null, string id = null)
+        public static JsonRpcRequest Create(string method, object parameters = null, string id = null)
         {
             JToken paramsToken = parameters != null
                 ? parameters is JToken token ? token : JToken.FromObject(parameters)
                 : null;
 
-            return new JsonRPCRequest
+            return new JsonRpcRequest
             {
                 JsonRpc = "2.0",
                 Method = method,
@@ -210,7 +211,7 @@ namespace revit_mcp_plugin.Core.JsonRPC
         /// <param name="method">方法名称</param>
         /// <param name="parameters">方法参数</param>
         /// <returns>创建的通知请求对象</returns>
-        public static JsonRPCRequest CreateNotification(string method, object parameters = null)
+        public static JsonRpcRequest CreateNotification(string method, object parameters = null)
         {
             return Create(method, parameters, null);
         }
